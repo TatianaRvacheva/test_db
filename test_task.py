@@ -79,7 +79,7 @@ class TestDB(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """Удаление тестируемой таблицы"""
-        print(f'Тестовая таблица {cls.table_name} будет удалена')
+        print(f'Отправлен запрос на удаление таблицы {cls.table_name}')
         send_db_command(commands=[f'DROP TABLE {cls.table_name}'], db_name=cls.db_name, user=cls.user)
 
     def check_data(self, result, excpected_data=None, cup=True):
@@ -114,12 +114,12 @@ class TestDB(unittest.TestCase):
 
     @parameterized.expand(db.neg_change_data)
     def test_error_update_data(self, name, index):
+        print("Проверка получения ошибки о нарушении целостности...")
         update_cmd = f"UPDATE {self.table_name} SET Index = {index} WHERE Name = '{name}';"
         select_cmd = f"SELECT Name, DataOfBirth FROM {self.table_name} WHERE Name =  '{name}';"
 
         result = send_db_command(commands=[update_cmd, select_cmd], db_name=self.db_name, user=self.user)
         self.assertIsNone(result, msg='SELECT CMD: No data about table')
-        print(f'Все данные {result} присутствуют')
 
 
 if __name__ == '__main__':
