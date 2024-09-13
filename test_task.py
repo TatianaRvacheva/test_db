@@ -82,7 +82,8 @@ class TestDB(unittest.TestCase):
         print(f'Отправлен запрос на удаление таблицы {cls.table_name}')
         send_db_command(commands=[f'DROP TABLE {cls.table_name}'], db_name=cls.db_name, user=cls.user)
 
-    def check_data(self, result, excpected_data=None, cup=True):
+    def check_data(self, result: list, excpected_data: list = None, cup: bool = True):
+        """Проверка на наличие полученных данных в исходных"""
         if not excpected_data:
             excpected_data = db.table_data
         for item in result:
@@ -95,6 +96,7 @@ class TestDB(unittest.TestCase):
         print(f'Все данные {result} присутствуют')
 
     def test_add_data(self):
+        """Тестирование вставки данных"""
         insert_cmd = f"INSERT INTO {self.table_name} (Name, DataOfBirth) VALUES"
         insert_cmd = create_sql_cmd(cmd=insert_cmd, data=db.table_data, method='INSERT')
         select_cmd = f"SELECT * FROM {self.table_name};"
@@ -104,7 +106,8 @@ class TestDB(unittest.TestCase):
         self.check_data(result)
 
     @parameterized.expand(db.change_data)   # можно масштабировать и увеличить в коли-ве параметры для изменения
-    def test_update_data(self, name, dateofbirth):
+    def test_update_data(self, name: str, dateofbirth: str):
+        """Тестирование обновления данных"""
         update_cmd = f"UPDATE {self.table_name} SET DataOfBirth = '{dateofbirth}' WHERE Name = '{name}';"
         select_cmd = f"SELECT Name, DataOfBirth FROM {self.table_name} WHERE Name =  '{name}';"
 
@@ -113,7 +116,8 @@ class TestDB(unittest.TestCase):
         self.check_data(result, [(name, dateofbirth)], cup=False)
 
     @parameterized.expand(db.neg_change_data)
-    def test_error_update_data(self, name, index):
+    def test_error_update_data(self, name: str, index: str):
+        """Тестирование получения ошибки о нарушении целостности"""
         print("Проверка получения ошибки о нарушении целостности...")
         update_cmd = f"UPDATE {self.table_name} SET Index = {index} WHERE Name = '{name}';"
         select_cmd = f"SELECT Name, DataOfBirth FROM {self.table_name} WHERE Name =  '{name}';"
